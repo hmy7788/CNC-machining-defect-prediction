@@ -278,5 +278,28 @@
     },
     "holdout_note": "hold-out is 5 experiments (No = 6, 10, 11, 15, 16), looked at exactly once -- sanity check, NOT a final performance figure. Both models predicted [0,0,0,0,1] against y_true [1,1,0,0,1], missing 2 of the 3 defects. RF hold-out ROC AUC 1.0 is not evidence of a perfect model: with 3 positives and 2 negatives a random ranking is perfect with probability 1/10.",
     "conclusion": "First non-chance score in the project, but it must NOT be reported as defect-prediction performance. RF balanced accuracy 0.8375 beat all 10 group-preserving permutation draws (null 0.463 +/- 0.146, max 0.722), yet 10 permutations bound the empirical p-value at >= 1/11 ~ 0.091, so it is suggestive rather than significant. Logistic 0.725 exactly equals its own null maximum (0.725) and is chance level. Crucially, n_rows ALONE reaches balanced accuracy 0.8375 / ROC AUC 0.8625 -- the same as the best full-feature model -- because unfinalised runs stop early and being unfinalised is half the definition of defect. The models are largely detecting 'this cut was aborted', which is a recording of the outcome rather than a prediction of it."
+  },
+  "008": {
+    "doc": "docs/experiments/008-preprocess-inspection-target.md",
+    "script": "src/features/build_features_v4_inspection.py",
+    "date": "2026-09-04",
+    "note": "Preprocessing only -- no model trained here (that is 009). Registered for the dataset composition and the n_rows-by-target diagnostic that motivated 009's residual-risk checks, per CLAUDE.md 필수: 전처리 실험 기록.",
+    "population_filter": "machining_finalized == 'yes' (19 experiments)",
+    "excluded_unfinished_experiments": [4, 5, 7, 16, 20, 23],
+    "excluded_label_conflict_experiments": [19, 25],
+    "paired_experiments_same_split": [14, 24],
+    "n_experiments": 17,
+    "n_features": 181,
+    "progress_features_kept": true,
+    "random_seed": 42,
+    "train_No": [1, 2, 3, 6, 8, 10, 13, 14, 17, 18, 21, 22, 24],
+    "test_No": [9, 11, 12, 15],
+    "train_target_counts": { "0": 9, "1": 4 },
+    "test_target_counts": { "0": 3, "1": 1 },
+    "n_rows_by_target": {
+      "0": { "count": 12, "min": 565.0, "max": 2332.0, "mean": 1840.0 },
+      "1": { "count": 5, "min": 605.0, "max": 1668.0, "mean": 1122.0 }
+    },
+    "note_on_007_shortcut": "007's n_rows-alone shortcut required unfinished runs (n_rows 462-605) to be present. Here every experiment finished, and the two target groups' n_rows ranges (565-2332 vs 605-1668) fully overlap -- confirmed empirically in 009 as a much weaker (and non-significant) residual signal, not the outright leak found in 007."
   }
 }
