@@ -301,5 +301,130 @@
       "1": { "count": 5, "min": 605.0, "max": 1668.0, "mean": 1122.0 }
     },
     "note_on_007_shortcut": "007's n_rows-alone shortcut required unfinished runs (n_rows 462-605) to be present. Here every experiment finished, and the two target groups' n_rows ranges (565-2332 vs 605-1668) fully overlap -- confirmed empirically in 009 as a much weaker (and non-significant) residual signal, not the outright leak found in 007."
+  },
+  "009": {
+    "doc": "docs/experiments/009-model-inspection.md",
+    "script": "src/models/train_inspection.py",
+    "date": "2026-09-04",
+    "dataset": "features_v4 (train 13 experiments / 12 CV groups, test 4 experiments, 181 features) -- built by 008, population restricted to machining_finalized == 'yes'",
+    "target": "inspection_fail",
+    "target_note": "inspection_fail (1 = failed visual inspection) on the 17 FINISHED experiments only. Different problem and different population from 007 (defect, 23 experiments) and from 003/005 (tool_condition_worn) -- none of those scores is a baseline here.",
+    "primary_metric": "train is 9 pass / 4 fail (positive rate 0.308), so accuracy alone is not reported as the headline: a constant 'pass' predictor already scores 0.692. Primary metric is balanced accuracy (0.5 = majority-class baseline, and it keeps 003-008 comparable); F1 on the failure class and threshold-free ROC AUC are reported beside it. All are computed on the pooled 12-fold predictions because a single fold holds out 1-2 rows.",
+    "cv": "LeaveOneGroupOut(groups=No with 24 -> 14) over the 13 training rows = 12 folds; metrics pooled over the 13 held-out predictions",
+    "logreg_l2": {
+      "params": {
+        "penalty": "l2",
+        "C": 0.1,
+        "class_weight": "balanced",
+        "max_iter": 1000,
+        "solver": "lbfgs",
+        "scaler": "StandardScaler refit inside each CV fold"
+      },
+      "seeds": "deterministic, single run",
+      "logo_accuracy": 0.5384615384615384,
+      "logo_f1": 0.25,
+      "logo_balanced_accuracy": 0.4583333333333333,
+      "logo_roc_auc": 0.5,
+      "holdout_accuracy": 1.0,
+      "holdout_f1": 1.0,
+      "holdout_balanced_accuracy": 1.0,
+      "holdout_roc_auc": 1.0
+    },
+    "random_forest": {
+      "params": { "n_estimators": 200, "max_depth": 3, "class_weight": "balanced" },
+      "seeds": [0, 1, 2, 3, 4],
+      "logo_accuracy_mean": 0.476923076923077,
+      "logo_accuracy_std": 0.03076923076923075,
+      "logo_f1_mean": 0.0,
+      "logo_f1_std": 0.0,
+      "logo_balanced_accuracy_mean": 0.34444444444444444,
+      "logo_balanced_accuracy_std": 0.022222222222222233,
+      "logo_roc_auc_mean": 0.42777777777777776,
+      "logo_roc_auc_std": 0.028327886186626572,
+      "holdout_seed": 0,
+      "holdout_accuracy": 1.0,
+      "holdout_f1": 1.0,
+      "holdout_balanced_accuracy": 1.0,
+      "holdout_roc_auc": 1.0
+    },
+    "residual_risk_diagnostics": {
+      "note": "008 flagged two ways this table could score without any sensor signal: (1) n_rows, which is spearman -0.81 with feedrate and reached 0.778 balanced separation with a post-hoc threshold, and (2) feedrate, which can act as a near-identifier at n=13. Both were run as single-feature models, and the whole table was re-run with feedrate dropped (180 features).",
+      "n_rows_only_logreg_balanced_accuracy": 0.7638888888888888,
+      "n_rows_only_logreg_roc_auc": 0.75,
+      "n_rows_only_logreg_f1": 0.6666666666666666,
+      "n_rows_only_rf_balanced_accuracy_mean": 0.5277777777777778,
+      "n_rows_only_rf_roc_auc_mean": 0.6444444444444445,
+      "feedrate_only_logreg_balanced_accuracy": 0.5138888888888888,
+      "feedrate_only_logreg_roc_auc": 0.33333333333333337,
+      "feedrate_only_rf_balanced_accuracy_mean": 0.3277777777777778,
+      "feedrate_only_rf_roc_auc_mean": 0.1388888888888889,
+      "feedrate_dropped_n_features": 180,
+      "feedrate_dropped_logreg_balanced_accuracy": 0.4583333333333333,
+      "feedrate_dropped_logreg_roc_auc": 0.5,
+      "feedrate_dropped_rf_balanced_accuracy_mean": 0.34444444444444444,
+      "feedrate_dropped_rf_balanced_accuracy_std": 0.022222222222222233,
+      "n_rows_and_feedrate_logreg_balanced_accuracy": 0.7083333333333333,
+      "n_rows_and_feedrate_rf_balanced_accuracy_mean": 0.4027777777777778,
+      "feedrate_as_near_identifier": {
+        "note": "008 warning 2: with 13 experiments a feedrate value can single out one experiment. Values occurring once in train are listed with their label.",
+        "train_feedrate_counts": { "3": 6, "6": 3, "12": 1, "20": 3 },
+        "singleton_values": [{ "feedrate": 12, "No": 10, "inspection_fail": 1 }],
+        "test_feedrates_unseen_in_train": [{ "No": 9, "feedrate": 15 }]
+      }
+    },
+    "permutation_check_logreg": {
+      "n_permutations": 100,
+      "shuffle_unit": "CV group (No with 24 -> 14) -- the duplicate pair shares one label",
+      "observed_balanced_accuracy": 0.4583333333333333,
+      "n_null_ge_observed": 48,
+      "p_value_balanced_accuracy": 0.48514851485148514,
+      "p_value_floor": 0.009900990099009901,
+      "accuracy": { "mean": 0.49923076923076926, "std": 0.16835261670165944, "max": 0.8461538461538461, "p95": 0.7730769230769229 },
+      "balanced_accuracy": { "mean": 0.4434027777777778, "std": 0.17575524584746036, "max": 0.8375, "p95": 0.7143749999999999 },
+      "roc_auc": { "mean": 0.4111666666666667, "std": 0.21458040451075677, "max": 0.9722222222222223, "p95": 0.8065277777777777 }
+    },
+    "permutation_check_rf": {
+      "n_permutations": 100,
+      "shuffle_unit": "CV group (No with 24 -> 14) -- the duplicate pair shares one label",
+      "observed_balanced_accuracy": 0.3888888888888889,
+      "n_null_ge_observed": 63,
+      "p_value_balanced_accuracy": 0.6336633663366337,
+      "p_value_floor": 0.009900990099009901,
+      "accuracy": { "mean": 0.5515384615384616, "std": 0.1397609963282838, "max": 0.8461538461538461, "p95": 0.7692307692307693 },
+      "balanced_accuracy": { "mean": 0.43044444444444446, "std": 0.1306377814350489, "max": 0.8375, "p95": 0.6759722222222222 },
+      "roc_auc": { "mean": 0.31915277777777784, "std": 0.24480901593366086, "max": 0.9, "p95": 0.7513888888888889 }
+    },
+    "permutation_check_logreg_n_rows_only": {
+      "n_permutations": 100,
+      "shuffle_unit": "CV group (No with 24 -> 14) -- the duplicate pair shares one label",
+      "observed_balanced_accuracy": 0.7638888888888888,
+      "n_null_ge_observed": 10,
+      "p_value_balanced_accuracy": 0.10891089108910891,
+      "p_value_floor": 0.009900990099009901,
+      "accuracy": { "mean": 0.4853846153846154, "std": 0.20973214814257032, "max": 0.9230769230769231, "p95": 0.7692307692307693 },
+      "balanced_accuracy": { "mean": 0.4757083333333334, "std": 0.21435541608707767, "max": 0.9444444444444444, "p95": 0.7638888888888888 },
+      "roc_auc": { "mean": 0.41733333333333333, "std": 0.2624052209846443, "max": 0.9, "p95": 0.7805555555555554 }
+    },
+    "leak_check": {
+      "n_features": 181,
+      "excluded_columns": ["No", "inspection_fail", "tool_condition_worn"],
+      "banned_columns_in_features": [],
+      "train_test_experiment_overlap": [],
+      "duplicate_pair": [14, 24],
+      "duplicate_rows_identical": true,
+      "duplicate_pair_same_label": true,
+      "n_cv_groups": 12,
+      "assert_passed": true
+    },
+    "holdout_note": "4 experiments (3 pass / 1 fail), looked at exactly once -- sanity check, NOT a final performance figure. The single failing experiment sets sensitivity to either 0 or 1, and one experiment moves accuracy by 25 percentage points.",
+    "holdout_predictions": {
+      "experiments": [9, 11, 12, 15],
+      "y_true": [1, 0, 0, 0],
+      "logreg_y_pred": [1, 0, 0, 0],
+      "logreg_y_score": [0.7645, 0.1891, 0.0922, 0.2504],
+      "rf_y_pred": [1, 0, 0, 0],
+      "rf_y_score": [0.675, 0.18, 0.04, 0.31]
+    },
+    "conclusion": "Negative result. With 181 experiment-level features on 13 training experiments (12 CV groups, 9 pass / 4 fail) neither fixed model reaches the majority-class baseline: logistic balanced accuracy 0.458 (empirical p = 0.485 against its own 100-draw group-preserving null) and RF 0.344 (p = 0.634, F1 exactly 0.000 on all 5 seeds -- the forest never predicts a failure). The only configuration above 0.5 is n_rows ALONE (logistic 0.764), which beats every 181-feature model and confirms 008's residual risk 1 -- but its own 1-feature null gives p = 0.109 with the observed score sitting exactly at the null's 95th percentile, so it is not significant either. 008's residual risk 2 (feedrate memorisation) did NOT occur: dropping feedrate changes both scores by exactly 0.000 and feedrate alone scores 0.514 -- though that is because nothing was learned, not because the models are principled. The hold-out is 4/4 correct for both models, and must NOT be read as performance: it contradicts the CV, n = 4 with a single failure, and the one failure it catches (No=9) is the shortest run in the hold-out, so it is indistinguishable from the n_rows shortcut. Raising the permutation count from 007's 10 to 100 was decisive: the null maximum is 0.8375, i.e. shuffled labels reproduce the exact score 007 reported as 'hard to call chance'."
   }
 }
