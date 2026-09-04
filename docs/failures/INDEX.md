@@ -7,6 +7,7 @@
 | 번호 | 제목 | 태그 |
 |---|---|---|
 | 001 | [통합데이터 Y 라벨 의미 역산 실패](001-integrated-dataset-labels.md) | `#data` |
+| 002 | [중복 실험 파일이 서로 다른 라벨을 갖고 있음](002-duplicate-experiment-conflicting-labels.md) | `#data` |
 
 같은 태그가 3건 이상 쌓이면, 그 태그의 실패 패턴을 CLAUDE.md의 상시 규칙으로 승격할지 검토한다.
 새 항목을 추가할 땐 `docs/experiments/TEMPLATE.md`가 아니라 기존 파일 하나를 복사해서 형식을

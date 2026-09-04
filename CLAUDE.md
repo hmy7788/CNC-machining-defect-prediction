@@ -120,7 +120,9 @@ scripts/         # 하네스 점검용 스크립트
   충돌로 드러나게 하기 위함.
 
 ### 3. 피드백 루프
-- **가이드**: 아직 예제 코드가 없다 — 첫 모듈을 추가할 때 이 섹션에 패턴 예시를 채워 넣는다.
+- **가이드**: `src/visualization/eda_baseline.py`(EDA), `src/features/build_features_v1.py`(전처리·
+  피처 엔지니어링)가 코드 패턴 예시다 — 데이터 읽기 전용, 수치 하드코딩 없이 스크립트 stdout에서
+  `docs/experiments/`로 옮겨 적기, 분할/스케일링 fit은 train에서만 하는 관례를 그대로 따른다.
 - **센서**: `tests/test_data_integrity.py`는 데이터 리뷰 중 직접 확인한 사실(실험 파일 25개, 원본
   실험 데이터 행 수 합계가 통합데이터 행 수와 일치, `Y_test.csv`가 단일 클래스뿐이라는 문제)을 그대로
   회귀 테스트로 박아뒀다. 이 테스트가 실패하면 원본 데이터가 바뀐 것이므로 `docs/decisions/`,

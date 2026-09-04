@@ -1,1 +1,67 @@
-{}
+{
+  "003": {
+    "doc": "docs/experiments/003-model-baseline.md",
+    "script": "src/models/train_baseline.py",
+    "date": "2026-09-04",
+    "dataset": "features_v1 (train 16 experiments / test 5 experiments, 181 features)",
+    "target": "tool_condition_worn",
+    "primary_metric": "balanced_accuracy (train label split is 8/8; F1 and ROC AUC reported alongside)",
+    "cv": "LeaveOneOut over the 16 training experiments, metrics pooled over the 16 held-out predictions",
+    "logreg_l2": {
+      "params": {
+        "penalty": "l2",
+        "C": 0.1,
+        "class_weight": "balanced",
+        "max_iter": 1000,
+        "solver": "lbfgs",
+        "scaler": "StandardScaler refit inside each CV fold"
+      },
+      "seeds": "deterministic, single run",
+      "loo_accuracy_mean": 0.5,
+      "loo_accuracy_std": 0.0,
+      "loo_f1_mean": 0.5555555555555556,
+      "loo_f1_std": 0.0,
+      "loo_balanced_accuracy_mean": 0.5,
+      "loo_balanced_accuracy_std": 0.0,
+      "loo_roc_auc_mean": 0.53125,
+      "loo_roc_auc_std": 0.0,
+      "holdout_accuracy": 0.4,
+      "holdout_f1": 0.5714285714285714,
+      "holdout_balanced_accuracy": 0.3333333333333333,
+      "holdout_roc_auc": 0.0
+    },
+    "random_forest": {
+      "params": {
+        "n_estimators": 200,
+        "max_depth": 3,
+        "class_weight": "balanced"
+      },
+      "seeds": [0, 1, 2, 3, 4],
+      "loo_accuracy_mean": 0.475,
+      "loo_accuracy_std": 0.03061862178478973,
+      "loo_f1_mean": 0.5215686274509803,
+      "loo_f1_std": 0.04162531589043311,
+      "loo_balanced_accuracy_mean": 0.475,
+      "loo_balanced_accuracy_std": 0.03061862178478973,
+      "loo_roc_auc_mean": 0.46875,
+      "loo_roc_auc_std": 0.03423265984407288,
+      "holdout_seed": 0,
+      "holdout_accuracy": 0.4,
+      "holdout_f1": 0.5714285714285714,
+      "holdout_balanced_accuracy": 0.3333333333333333,
+      "holdout_roc_auc": 0.5
+    },
+    "permutation_check_logreg": {
+      "n_permutations": 10,
+      "loo_accuracy_mean": 0.40625,
+      "loo_accuracy_std": 0.19415280708761334,
+      "loo_accuracy_max": 0.75
+    },
+    "leak_check": {
+      "banned_columns_in_features": [],
+      "n_features": 181,
+      "assert_passed": true
+    },
+    "holdout_note": "hold-out is 5 experiments -- sanity check only, NOT a final performance figure. One experiment moves accuracy by 20 percentage points."
+  }
+}
