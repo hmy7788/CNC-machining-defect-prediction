@@ -166,5 +166,117 @@
     },
     "holdout_note": "hold-out is 52 windows but only 5 independent experiments -- sanity check only, NOT a final performance figure. RF hold-out window-level balanced accuracy 0.735 vs experiment-level 0.333 (mean prob) / 0.583 (majority vote): the window figure is inflated by the two long test experiments (No=12 with 22 windows, No=15 with 13 windows carry 35/52 windows), which is exactly the 'window score >> experiment score' warning in 004.",
     "conclusion": "No improvement over 003. Every LeaveOneGroupOut experiment-level balanced accuracy (0.4375 logreg, 0.4625 / 0.5125 RF) sits inside the group-preserving permutation null (0.406 +/- 0.177, max 0.8125). Increasing rows 16 -> 201 while the number of independent experiments stays 16 did not produce signal."
+  },
+  "007": {
+    "doc": "docs/experiments/007-model-defect.md",
+    "script": "src/models/train_defect.py",
+    "date": "2026-09-04",
+    "dataset": "features_v3 (train 18 experiments / 17 CV groups, test 5 experiments, 181 features)",
+    "target": "defect",
+    "target_note": "defect = NOT(machining_finalized AND passed_visual_inspection). A DIFFERENT problem from the tool_condition_worn target of 003/005 (the two labels agree on only 14/23 experiments), so 003/005 scores are NOT a baseline for these numbers.",
+    "primary_metric": "balanced_accuracy (train label split is 10 good / 8 defective, i.e. 0.444 positive rate; F1 and ROC AUC reported alongside)",
+    "cv": "LeaveOneGroupOut(groups=No with 24 -> 14) over the 18 training rows = 17 folds; metrics pooled over the 18 held-out predictions. The remap merges the byte-identical experiment pair 14/24 into one group so neither can be predicted from its own copy.",
+    "logreg_l2": {
+      "params": {
+        "penalty": "l2",
+        "C": 0.1,
+        "class_weight": "balanced",
+        "max_iter": 1000,
+        "solver": "lbfgs",
+        "scaler": "StandardScaler refit inside each CV fold"
+      },
+      "seeds": "deterministic, single run",
+      "logo_accuracy_mean": 0.7222222222222222,
+      "logo_accuracy_std": 0.0,
+      "logo_f1_mean": 0.7058823529411765,
+      "logo_f1_std": 0.0,
+      "logo_balanced_accuracy_mean": 0.725,
+      "logo_balanced_accuracy_std": 0.0,
+      "logo_roc_auc_mean": 0.775,
+      "logo_roc_auc_std": 0.0,
+      "holdout_accuracy": 0.6,
+      "holdout_f1": 0.5,
+      "holdout_balanced_accuracy": 0.6666666666666666,
+      "holdout_roc_auc": 0.8333333333333333
+    },
+    "random_forest": {
+      "params": {
+        "n_estimators": 200,
+        "max_depth": 3,
+        "class_weight": "balanced"
+      },
+      "seeds": [0, 1, 2, 3, 4],
+      "logo_accuracy_mean": 0.8333333333333334,
+      "logo_accuracy_std": 0.0,
+      "logo_f1_mean": 0.8235294117647058,
+      "logo_f1_std": 0.0,
+      "logo_balanced_accuracy_mean": 0.8375,
+      "logo_balanced_accuracy_std": 0.0,
+      "logo_roc_auc_mean": 0.79625,
+      "logo_roc_auc_std": 0.016583123951776992,
+      "holdout_seed": 0,
+      "holdout_accuracy": 0.6,
+      "holdout_f1": 0.5,
+      "holdout_balanced_accuracy": 0.6666666666666666,
+      "holdout_roc_auc": 1.0
+    },
+    "pairing_effect_14_24": {
+      "note": "Reported CV merges the duplicate pair into one group (17 folds). The naive 18-fold LOO that treats 24 as an independent sample is shown for comparison only. The difference was exactly 0.000 for both models -- predictions were identical on all 18 rows, because 14 and 24 are still predicted correctly when neither is in the training fold. The merge is kept anyway: a zero bias observed after the fact does not make the naive LOO valid.",
+      "logreg_balanced_accuracy_merged_17_groups": 0.725,
+      "logreg_balanced_accuracy_naive_18_folds": 0.725,
+      "rf_balanced_accuracy_merged_17_groups": 0.8375,
+      "rf_balanced_accuracy_naive_18_folds": 0.8375
+    },
+    "progress_feature_ablation": {
+      "note": "n_rows, M_sequence_number_{mean,std,max} and proc_frac_* (14 columns) record how far the cut got. 5 of the 8 defective training experiments are machining_finalized == 'no', i.e. runs that STOPPED EARLY, so these columns are a proxy for half the target's own definition. n_rows alone (462-605 rows for unfinalised runs vs 565-2332 for finalised) separates 16/18 training experiments. Dropping the 14 columns barely moves the score, so the same information is also spread across the ordinary sensor statistics.",
+      "n_progress_features": 14,
+      "n_features_after_drop": 167,
+      "logreg_sensor_only_balanced_accuracy": 0.725,
+      "logreg_sensor_only_roc_auc": 0.7625000000000001,
+      "rf_sensor_only_balanced_accuracy_mean": 0.8275,
+      "rf_sensor_only_balanced_accuracy_std": 0.020000000000000018,
+      "rf_sensor_only_roc_auc_mean": 0.79125,
+      "logreg_n_rows_only_balanced_accuracy": 0.8375,
+      "logreg_n_rows_only_roc_auc": 0.8625,
+      "rf_n_rows_only_balanced_accuracy_mean": 0.725,
+      "rf_n_rows_only_roc_auc_mean": 0.6875
+    },
+    "permutation_check_logreg": {
+      "n_permutations": 10,
+      "shuffle_unit": "CV group (No with 24 -> 14) -- the duplicate pair shares one shuffled label",
+      "balanced_accuracy_mean": 0.5163888888888888,
+      "balanced_accuracy_std": 0.17993354397363925,
+      "balanced_accuracy_max": 0.725,
+      "roc_auc_mean": 0.5090740740740741,
+      "roc_auc_std": 0.19988057753346247
+    },
+    "permutation_check_rf": {
+      "n_permutations": 10,
+      "shuffle_unit": "CV group (No with 24 -> 14) -- the duplicate pair shares one shuffled label",
+      "note": "Built separately from the logistic null because a null has to come from the same estimator as the score it judges, and RF is the model that scores highest here. 003/005 only ever built a logistic null.",
+      "balanced_accuracy_mean": 0.46277777777777784,
+      "balanced_accuracy_std": 0.14574706443055196,
+      "balanced_accuracy_max": 0.7222222222222222
+    },
+    "permutation_check_logreg_sensor_only": {
+      "n_permutations": 10,
+      "balanced_accuracy_mean": 0.5102777777777778,
+      "balanced_accuracy_std": 0.17905918395330828,
+      "balanced_accuracy_max": 0.725
+    },
+    "leak_check": {
+      "banned_columns_in_features": [],
+      "n_features": 181,
+      "excluded_columns": ["No", "defect", "tool_condition_worn"],
+      "train_test_experiment_overlap": [],
+      "duplicate_pair": [14, 24],
+      "duplicate_rows_identical": true,
+      "duplicate_pair_same_label": true,
+      "n_cv_groups": 17,
+      "raw_file_md5_duplicate_groups": [[14, 24], [19, 25]],
+      "assert_passed": true
+    },
+    "holdout_note": "hold-out is 5 experiments (No = 6, 10, 11, 15, 16), looked at exactly once -- sanity check, NOT a final performance figure. Both models predicted [0,0,0,0,1] against y_true [1,1,0,0,1], missing 2 of the 3 defects. RF hold-out ROC AUC 1.0 is not evidence of a perfect model: with 3 positives and 2 negatives a random ranking is perfect with probability 1/10.",
+    "conclusion": "First non-chance score in the project, but it must NOT be reported as defect-prediction performance. RF balanced accuracy 0.8375 beat all 10 group-preserving permutation draws (null 0.463 +/- 0.146, max 0.722), yet 10 permutations bound the empirical p-value at >= 1/11 ~ 0.091, so it is suggestive rather than significant. Logistic 0.725 exactly equals its own null maximum (0.725) and is chance level. Crucially, n_rows ALONE reaches balanced accuracy 0.8375 / ROC AUC 0.8625 -- the same as the best full-feature model -- because unfinalised runs stop early and being unfinalised is half the definition of defect. The models are largely detecting 'this cut was aborted', which is a recording of the outcome rather than a prediction of it."
   }
 }
