@@ -43,6 +43,14 @@ scripts/         # 하네스 점검용 스크립트
   이유는 `docs/decisions/001-data-source-strategy.md`와
   `docs/failures/001-integrated-dataset-labels.md`에 기록되어 있다.
 
+## 필수: 전처리·실험 기록
+
+**데이터 전처리를 하든, 모델을 학습/평가하든, 무언가를 실험하든 — 끝나면 반드시
+`docs/experiments/`에 결과와 트러블슈팅을 기록한다.** 템플릿은
+`docs/experiments/TEMPLATE.md`. 성공/실패 여부와 무관하게 기록한다 (실패도 기록해야 다음 세션이
+같은 시도를 반복하지 않는다 — `docs/failures/`와 같은 취지). 기술적 선택을 내렸다면
+`docs/decisions/`에도 별도로 남긴다. "나중에 기록하기"는 없다 — 세션이 끝나면 맥락이 사라진다.
+
 ## 하네스 엔지니어링
 
 이 프로젝트는 다음 5가지 구성 요소로 하네스를 구축했다 (참고: Notion `AI 하네스 엔지니어링`).
@@ -52,7 +60,7 @@ scripts/         # 하네스 점검용 스크립트
 | 1. 지시 문서 | 이 `CLAUDE.md` 자체 |
 | 2. 아키텍처 제약 | `pyproject.toml` (ruff 설정), `.pre-commit-config.yaml`, `.gitattributes` |
 | 3. 피드백 루프 | `tests/`, `.github/workflows/ci.yml` |
-| 4. 지식 저장소 | `docs/decisions/`, `docs/failures/`, `docs/domain/` |
+| 4. 지식 저장소 | `docs/decisions/`, `docs/failures/`, `docs/domain/`, `docs/experiments/` |
 | 5. 가비지 컬렉션 | `scripts/check_docs_drift.py`, `scripts/check_structure.py`, `.github/workflows/housekeeping.yml` (매주 월요일 자동 실행) |
 
 ### 1. 지시 문서
@@ -83,6 +91,8 @@ scripts/         # 하네스 점검용 스크립트
 - `docs/failures/001-integrated-dataset-labels.md`: `Y_*` 라벨이 어떤 컬럼을 인코딩했는지 행 순서로
   역산하려다 실패한 기록 — 같은 시도를 반복하지 않기 위함.
 - `docs/domain/glossary.md`: KAMP 데이터 출처, `train.csv`/`experiment_XX.csv` 컬럼 용어 정리.
+- `docs/experiments/`: 전처리·모델 실험을 할 때마다 남기는 결과·트러블슈팅 로그
+  (`docs/experiments/TEMPLATE.md` 형식, 위 "필수: 전처리·실험 기록" 참고).
 - 앞으로 에이전트가 잘못된 방향을 제안했다가 정정되거나, 기술적 결정을 내릴 때마다 이 아래에 문서를
   추가한다.
 
