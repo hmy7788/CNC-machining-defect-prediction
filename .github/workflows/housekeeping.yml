@@ -26,3 +26,6 @@ jobs:
 
       - name: 구조 드리프트 감지
         run: python scripts/check_structure.py
+
+      - name: 보고 수치 정합성 감지
+        run: python scripts/check_report.py

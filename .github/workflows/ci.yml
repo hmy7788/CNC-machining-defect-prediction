@@ -23,3 +23,6 @@ jobs:
 
       - name: Tests
         run: pytest tests/ -v
+
+      - name: Report metrics consistency
+        run: python scripts/check_report.py

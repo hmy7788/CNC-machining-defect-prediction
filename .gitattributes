@@ -8,3 +8,7 @@
 *.yaml text eol=lf
 
 *.pdf -text -diff
+
+# Notebooks: force a merge conflict instead of silently corrupting output
+# cells when two people (or two agent sessions) edit the same notebook.
+*.ipynb merge=binary
