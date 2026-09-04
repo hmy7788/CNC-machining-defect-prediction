@@ -1,0 +1,28 @@
+name: 하네스 상태 점검
+
+on:
+  schedule:
+    - cron: "0 9 * * 1" # 매주 월요일 오전 9시
+  workflow_dispatch:
+
+jobs:
+  drift-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: 미사용 코드 감지
+        run: vulture src/ || true
+
+      - name: 문서 드리프트 감지
+        run: python scripts/check_docs_drift.py
+
+      - name: 구조 드리프트 감지
+        run: python scripts/check_structure.py

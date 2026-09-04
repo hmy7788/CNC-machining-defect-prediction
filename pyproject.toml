@@ -1,0 +1,22 @@
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle
+    "F",   # pyflakes (unused imports/variables)
+    "I",   # isort (import sorting)
+    "N",   # naming conventions
+]
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.vulture]
+min_confidence = 80
+paths = ["src"]
+ignore_names = ["test_*", "setUp", "tearDown"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
