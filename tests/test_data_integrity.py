@@ -5,15 +5,24 @@ These encode facts already verified by hand during initial data review
 docs/failures/001-integrated-dataset-labels.md). If any of these start
 failing, the raw data changed and the docs above need a re-check before
 trusting anything built on top of it.
+
+data/raw/ is gitignored (not committed - see CLAUDE.md), so it won't exist
+on a fresh checkout such as CI. These tests skip in that case rather than
+failing; they only run when someone has the raw data locally.
 """
 
 import csv
 from pathlib import Path
 
+import pytest
+
 DATA_RAW = Path(__file__).resolve().parents[1] / "data" / "raw"
 EXPERIMENTS_DIR = DATA_RAW / "CNC 비식별화 원본데이터_1209" / "CNC Virtual Data set _v2"
 TRAIN_META_CSV = DATA_RAW / "CNC 비식별화 원본데이터_1209" / "train.csv"
 INTEGRATED_DIR = DATA_RAW / "CNC 학습통합데이터_1209"
+
+if not EXPERIMENTS_DIR.exists():
+    pytest.skip("data/raw/ not present locally (gitignored)", allow_module_level=True)
 
 
 def _data_row_count(csv_path: Path) -> int:

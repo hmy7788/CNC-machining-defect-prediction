@@ -73,7 +73,8 @@ scripts/         # 하네스 점검용 스크립트
 - **센서**: `tests/test_data_integrity.py`는 데이터 리뷰 중 직접 확인한 사실(실험 파일 25개, 원본
   실험 데이터 행 수 합계가 통합데이터 행 수와 일치, `Y_test.csv`가 단일 클래스뿐이라는 문제)을 그대로
   회귀 테스트로 박아뒀다. 이 테스트가 실패하면 원본 데이터가 바뀐 것이므로 `docs/decisions/`,
-  `docs/failures/` 문서를 다시 확인해야 한다.
+  `docs/failures/` 문서를 다시 확인해야 한다. `data/raw/`가 git에 없으므로(아래 "데이터 구조" 참고)
+  로컬에 데이터가 없으면 이 테스트 파일 전체가 skip된다 — CI에서는 항상 skip 상태다.
 - `.github/workflows/ci.yml`이 push/PR마다 `ruff check` + `ruff format --check` + `pytest`를 돌린다.
 
 ### 4. 지식 저장소
@@ -94,6 +95,11 @@ scripts/         # 하네스 점검용 스크립트
   실제 코드가 생기면 이 예외 처리를 제거한다.
 
 ## 데이터 구조
+
+**`data/raw/`, `data/processed/`는 git에 커밋되지 않는다** (`.gitignore` 참고). 로컬 디스크에는 있지만
+새로 clone하면 없다 — 원본은 [KAMP AI "CNC 머신 AI 데이터셋"](https://www.kamp-ai.kr)에서 직접
+받아야 한다. `tests/test_data_integrity.py`도 이 데이터가 로컬에 없으면(즉 CI에서는 항상) 자동으로
+skip되도록 만들어져 있다.
 
 - `data/raw/CNC 비식별화 원본데이터_1209/` — 원본 실험별 데이터셋 (공개된 "CNC Mill Tool Wear"
   데이터셋과 동일한 구조이며, KAMP AI "CNC 머신 AI 데이터셋"의 원천 데이터다):

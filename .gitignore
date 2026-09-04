@@ -26,3 +26,8 @@ Thumbs.db
 # Local secrets / env
 .env
 .env.*
+
+# Data (large / not meant to live in git history) - keep placeholders
+data/raw/*
+data/processed/*
+!data/processed/.gitkeep
