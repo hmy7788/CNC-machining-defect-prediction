@@ -426,5 +426,40 @@
       "rf_y_score": [0.675, 0.18, 0.04, 0.31]
     },
     "conclusion": "Negative result. With 181 experiment-level features on 13 training experiments (12 CV groups, 9 pass / 4 fail) neither fixed model reaches the majority-class baseline: logistic balanced accuracy 0.458 (empirical p = 0.485 against its own 100-draw group-preserving null) and RF 0.344 (p = 0.634, F1 exactly 0.000 on all 5 seeds -- the forest never predicts a failure). The only configuration above 0.5 is n_rows ALONE (logistic 0.764), which beats every 181-feature model and confirms 008's residual risk 1 -- but its own 1-feature null gives p = 0.109 with the observed score sitting exactly at the null's 95th percentile, so it is not significant either. 008's residual risk 2 (feedrate memorisation) did NOT occur: dropping feedrate changes both scores by exactly 0.000 and feedrate alone scores 0.514 -- though that is because nothing was learned, not because the models are principled. The hold-out is 4/4 correct for both models, and must NOT be read as performance: it contradicts the CV, n = 4 with a single failure, and the one failure it catches (No=9) is the shortest run in the hold-out, so it is indistinguishable from the n_rows shortcut. Raising the permutation count from 007's 10 to 100 was decisive: the null maximum is 0.8375, i.e. shuffled labels reproduce the exact score 007 reported as 'hard to call chance'."
+  },
+  "010": {
+    "doc": "docs/experiments/010-leaky-official-reproduction.md",
+    "script": "src/models/train_leaky_official.py (features: src/features/build_features_v5_leaky_rows.py)",
+    "date": "2026-09-07",
+    "warning": "INTENTIONAL LEAKAGE STUDY -- reproduces the official KAMP guidebook's row-level random split on purpose, to quantify its score inflation. The 'leaky' numbers below are NOT a defect-prediction performance claim and must never be cited as one. Only 'grouped' follows this project's validation discipline (identical to 007's split).",
+    "target": "defect",
+    "dataset": "features_v5, row-level (23 experiments, 30,918 raw timesteps, 44 sensor/process features, no aggregation) -- same label definition and experiment population as 006/007",
+    "design": "Same row-level feature table, same fixed-hyperparameter logreg (C=0.1, balanced) / RF (200 trees, depth=3, balanced, seeds 0-4) run under two split conditions that differ ONLY in how rows are assigned to train/test, so the gap between conditions isolates the split method.",
+    "leaky": {
+      "split_method": "train_test_split(shuffle=True, stratify=defect, test_size=0.2, random_state=42) over ALL rows, ignoring No entirely -- the guidebook's method",
+      "train_rows": 24734,
+      "test_rows": 6184,
+      "experiments_in_both_train_and_test": 23,
+      "logreg_real_balanced_accuracy": 0.8898257672634271,
+      "logreg_real_roc_auc": 0.9452964897288346,
+      "logreg_group_permuted_null_balanced_accuracy_mean": 0.6964998442751603,
+      "rf_real_balanced_accuracy_mean": 0.9046330906944717,
+      "rf_real_roc_auc_mean": 0.9782483175126238,
+      "rf_group_permuted_null_balanced_accuracy_mean": 0.7610714022684582,
+      "duplicate_pair_14_24_leaks_across_split": true
+    },
+    "grouped": {
+      "split_method": "whole-experiment split, reusing 007's frozen TRAIN_NOS/TEST_NOS (18/5 experiments)",
+      "train_rows": 24024,
+      "test_rows": 6894,
+      "experiments_in_both_train_and_test": 0,
+      "logreg_real_balanced_accuracy": 0.6828291655756767,
+      "logreg_real_roc_auc": 0.7835535546671596,
+      "logreg_group_permuted_null_balanced_accuracy_mean": 0.4101692515138476,
+      "rf_real_balanced_accuracy_mean": 0.578188667720503,
+      "rf_real_roc_auc_mean": 0.8763686470019174,
+      "rf_group_permuted_null_balanced_accuracy_mean": 0.3917789649284231
+    },
+    "conclusion": "The leaky split's group-permuted (meaningless-label) null already scores 0.696 (logreg) / 0.761 (RF) balanced accuracy -- far above chance -- because the model can recognise which experiment a row's raw sensor values came from (all 23 experiments appear on both sides of the split) and echo that experiment's now-random label back. The grouped split's null stays near chance (0.410 / 0.392), consistent with 007/009. Subtracting each condition's own null from its real score gives a similar real-signal size in both conditions (leaky +0.194/+0.145 vs grouped +0.273/+0.186), so the leaky split's higher headline number (0.89-0.90) is mostly a ~0.35-point row-identity memorisation floor stacked on top of comparable underlying signal -- not evidence that the guidebook's approach finds more real signal. This is consistent with the official guidebook's own reported 91.51%/99.60% being inflated by the same row-level-shuffle mechanism. A second, independent leak was also confirmed: byte-identical experiments 14/24 land on opposite sides of the leaky split."
   }
 }
